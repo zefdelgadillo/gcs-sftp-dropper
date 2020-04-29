@@ -106,7 +106,6 @@ class SFTPDropper:
     def mkdir_p(self, remote_directory):
         current_dir = './'
         for dir_element in remote_directory.split('/'):
-            logger.info(dir_element)
             if dir_element:
                 current_dir += dir_element + '/'
                 try:
