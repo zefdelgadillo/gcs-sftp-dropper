@@ -1,7 +1,9 @@
 from google.cloud import storage, secretmanager
 import paramiko
 import os
+import sys
 import logging
+import json
 from io import StringIO
 
 GCP_PROJECT = os.environ['GCP_PROJECT']
@@ -14,8 +16,9 @@ AUTH_MODE = os.environ['AUTH_MODE']
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 def main(event, context):
+    logger.debug(event)
+    logger.debug(context)
     bucket = event['bucket']
     file_name = event['name']
     if is_valid_operation(context):
@@ -34,7 +37,10 @@ def main(event, context):
 
 
 def is_valid_operation(context):
-    return context.event_type == 'google.storage.object.finalize'
+    if hasattr(context, "event_type"):
+      return context.event_type == 'google.storage.object.finalize'
+    elif context['event_type']:
+      return context['event_type'] == 'google.storage.object.finalize'
 
 
 def destination_filename(file_name):
@@ -116,3 +122,6 @@ class SFTPDropper:
 
     def close_connection(self):
         self.ssh_client.close()
+
+if __name__ == "__main__":
+    main(json.loads(sys.argv[1]), json.loads(sys.argv[2]))

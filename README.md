@@ -1,7 +1,23 @@
 # GCS to SFTP File Dropper
 This script will listen to a GCS bucket, then sync any newly written files to an SFTP server of your choice.
 
-## Usage
+## Usage (Docker)
+1. Build container
+```
+docker image build . -t gcs-sftp-dropper
+```
+2. Create .env file (see example.docker.env)
+3. Run container locally with the following arguments.
+```
+docker run \
+  --env-file=docker.env \ 
+  -v=$HOME/.config/gcloud:/root/.config/gcloud \
+  gcs-sftp-dropper \
+  '{"bucket":"bucket","name":"file-to-load.txt"}' \
+  '{"event_type":"google.storage.object.finalize"}'
+```
+
+## Usage (Cloud Function)
 1. Create a Service Account that contains the following permissions:
 * Secret Manager Secret Accessor
 * Storage Admin
