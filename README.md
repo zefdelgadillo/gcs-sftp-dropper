@@ -1,5 +1,5 @@
 # GCS to SFTP File Dropper
-This script will listen to a GCS bucket, then sync any newly written files to an SFTP server of your choice.
+This Cloud Function will listen to a GCS bucket, then sync any newly written files to an SFTP server of your choice.
 
 ## Usage
 1. Create a Service Account that contains the following permissions:
@@ -37,7 +37,7 @@ export BUCKET_NAME=<bucket name, do not include gs://>
 export SERVICE_ACCOUNT=<service account created above>
 ```
 
-6. Deploy the GCS function. i
+6. Deploy the GCS function.
 ```bash
 gcloud functions deploy sftp-dropper \
   --source=./src/ \
