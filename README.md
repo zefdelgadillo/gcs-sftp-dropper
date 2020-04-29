@@ -18,6 +18,7 @@ echo -n "my super secret data" | gcloud secrets create sftp-secret \
 SECRET_NAME: sftp-secret
 USERNAME: my-username
 SFTP_HOST: hostname
+BASE_DIR: '' # Custom base directory for files in SFTP
 ```
 
 4. (Optional) Create a [VPC Connector](https://cloud.google.com/vpc/docs/configure-serverless-vpc-access). If you need access to an SFTP server that uses private IP address or is on-premise, you can create a VPC Connector for this function.

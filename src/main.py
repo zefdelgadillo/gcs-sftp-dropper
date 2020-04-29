@@ -8,6 +8,7 @@ GCP_PROJECT = os.environ['GCP_PROJECT']
 SFTP_HOST = os.environ['SFTP_HOST']
 SECRET_NAME = os.environ['SECRET_NAME']
 USERNAME = os.environ['USERNAME']
+BASE_DIRECTORY = os.environ['BASE_DIR']
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,13 +21,20 @@ def main(event, context):
         bucket = storage_client.get_bucket(bucket)
         blob = bucket.blob(file_name)
         sftp_dropper = SFTPDropper()
-        sftp_dropper.write_file(blob, file_name)
+        sftp_dropper.write_file(blob, destination_filename(file_name))
         sftp_dropper.close_connection()
     else:
         logger.error("Not a valid event")
 
 def is_valid_operation(context):
     return context.event_type == 'google.storage.object.finalize'
+
+def destination_filename(file_name):
+  base_directory = BASE_DIRECTORY.lstrip('/').rstrip('/')
+  if base_directory == '':
+    return file_name
+  else:
+    return base_directory + '/' + file_name
 
 class SFTPDropper:
   def __init__(self):
@@ -39,6 +47,8 @@ class SFTPDropper:
       self.sftp_client = self.ssh_client.open_sftp()
     except Exception as e:
       logger.error(e)
+  
+
   
   def retrieve_ssh_key(self):
     try:
