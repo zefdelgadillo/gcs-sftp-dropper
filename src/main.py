@@ -36,6 +36,7 @@ class SFTPDropper:
       ssh_key = paramiko.RSAKey.from_private_key(StringIO(self.retrieve_ssh_key()))
       self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
       self.ssh_client.connect(SFTP_HOST, username=USERNAME, pkey=ssh_key)
+      self.sftp_client = self.ssh_client.open_sftp()
     except Exception as e:
       logger.error(e)
   
@@ -48,14 +49,27 @@ class SFTPDropper:
 
   def write_file(self, file_object, destination_filename):
     try:
-      sftp_client = self.ssh_client.open_sftp()
-      with sftp_client.file(destination_filename, 'w') as target:
+      self.mkdir_p(os.path.dirname(destination_filename))
+      with self.sftp_client.file(destination_filename, 'w') as target:
         file_object.download_to_file(target)
-      sftp_client.close()
       logger.info(f'Wrote {file_object} to {SFTP_HOST} at {destination_filename}')
     except Exception as e:
+      logger.error(f'Error writing to {destination_filename}')
       logger.error(e)
       self.ssh_client.close()
   
+  def mkdir_p(self, remote_directory):
+    logger.info(remote_directory)
+    current_dir = './'
+    for dir_element in remote_directory.split('/'):
+        logger.info(dir_element)
+        if dir_element:
+            current_dir += dir_element + '/'
+            try:
+                logger.info(f'Creating {current_dir}')
+                self.sftp_client.mkdir(current_dir)
+            except:
+                pass
+
   def close_connection(self):
     self.ssh_client.close()
