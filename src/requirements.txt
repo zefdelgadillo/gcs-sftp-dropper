@@ -1,4 +1,4 @@
-paramiko==2.7.1
+paramiko==2.10.1
 protobuf==3.11.3
 google-cloud-storage==1.21.0
 google-cloud-secret-manager==0.1.0
